@@ -7,6 +7,9 @@ import (
 	"upgradebot/pkg/github"
 )
 
+// GetAnalysis - create analysis that will provide
+// * all PRs merged in the new version (including risk assessment, files changed, packages changed, etc)
+// * the list of all files changed (including risk assessment and linked PR where the file was changed)
 func GetAnalysis(tagCompare github.TagCompare, filesChangedByQuorum []string, expectedFileConflicts []string) Analysis {
 	analysis := Analysis{}
 	analysis.PrStats = make([]PullRequestStats, len(tagCompare.PullRequests))

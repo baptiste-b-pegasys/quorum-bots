@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"math"
-	"net/http"
 	"strings"
 	"upgradebot/config"
 )
@@ -18,27 +15,28 @@ const TOKEN = "8b3d3c6b486590135699987e7e760de92575c8bf"
 
 const PullRequestTitleFormat = "[Upgrade] Go-Ethereum release %s"
 
-type apiImpl struct {
-	httpClient *http.Client
-}
-
 type GithubAPI interface {
-	GetReleaseData(tag string) ReleaseData
-	GetTagCompare(base string, target string) TagCompare
+	GetGethReleaseData(tag string) ReleaseData
+	GetGethTagComparison(base string, target string) TagCompare
 	GetNextReleaseFrom(baseTag string) ReleaseData
-	CreatePullRequest(branchName string, data ReleaseData, prBody string) PullRequestData
+	CreateQuorumPullRequest(branchName string, data ReleaseData, prBody string) PullRequestData
 	FindOpenUpgradePullRequest(targetTag string) *PullRequestData
 }
 
+type apiImpl struct {
+	httpAdapter *httpAdapter
+}
+
 func NewGithubAPI() GithubAPI {
-	client := &http.Client{}
+	client := &httpAdapter{}
 	return &apiImpl{
-		httpClient: client,
+		httpAdapter: client,
 	}
 }
 
+// GetNextReleaseFrom - get the next go-ethereum release after a specific version/tag
 func (api *apiImpl) GetNextReleaseFrom(baseTag string) ReleaseData {
-	releases := api.GetAllReleases()
+	releases := api.GetAllGethReleases()
 	releaseIndex := 0
 
 	for i, r := range releases {
@@ -54,8 +52,9 @@ func (api *apiImpl) GetNextReleaseFrom(baseTag string) ReleaseData {
 	return releases[releaseIndex]
 }
 
-func (api *apiImpl) GetAllReleases() []ReleaseData {
-	body, _ := api.sendGetRequest(config.GethGithubAPIUrl + "/releases")
+// GetAllGethReleases - get all go-ethereum releases
+func (api *apiImpl) GetAllGethReleases() []ReleaseData {
+	body, _ := api.httpAdapter.sendGetRequest(config.GethGithubAPIUrl + "/releases")
 	var data []ReleaseData
 
 	jsonErr := json.Unmarshal(body, &data)
@@ -66,10 +65,11 @@ func (api *apiImpl) GetAllReleases() []ReleaseData {
 	return data
 }
 
-func (api *apiImpl) GetReleaseData(tag string) ReleaseData {
+// GetGethReleaseData - get go-ethereum release data based on a tag
+func (api *apiImpl) GetGethReleaseData(tag string) ReleaseData {
 	url := fmt.Sprintf("%s/releases/tags/%s", config.GethGithubAPIUrl, tag)
 
-	body, _ := api.sendGetRequest(url)
+	body, _ := api.httpAdapter.sendGetRequest(url)
 	data := ReleaseData{}
 
 	jsonErr := json.Unmarshal(body, &data)
@@ -80,17 +80,19 @@ func (api *apiImpl) GetReleaseData(tag string) ReleaseData {
 	return data
 }
 
-func (api *apiImpl) GetTagCompare(base string, target string) TagCompare {
+// GetGethTagComparison - compare two geth tags and extract PR merged and files changed
+func (api *apiImpl) GetGethTagComparison(base string, target string) TagCompare {
 	commitChanges := api.getCommitChanges(base, target)
 	prsData := api.getPullRequests(commitChanges)
 	return TagCompare{PullRequests: prsData, Files: commitChanges.Files}
 }
 
-func (api *apiImpl) CreatePullRequest(branchName string, data ReleaseData, prBody string) PullRequestData {
+// CreateQuorumPullRequest - create PR in the quorum repo
+func (api *apiImpl) CreateQuorumPullRequest(branchName string, data ReleaseData, prBody string) PullRequestData {
 	title := fmt.Sprintf(PullRequestTitleFormat, data.Tag)
 	createPrBody := CreatePullRequest{Title: title, Body: prBody, Base: "master", Head: branchName, Draft: true}
 	jsonBody, _ := json.Marshal(createPrBody)
-	response, _ := api.sendPostRequest(config.QuorumAPIUrl+"/pulls", bytes.NewBuffer(jsonBody))
+	response, _ := api.httpAdapter.sendPostRequest(config.QuorumAPIUrl+"/pulls", bytes.NewBuffer(jsonBody))
 
 	result := PullRequestData{}
 	jsonErr := json.Unmarshal(response, &result)
@@ -104,7 +106,7 @@ func (api *apiImpl) CreatePullRequest(branchName string, data ReleaseData, prBod
 func (api *apiImpl) FindOpenUpgradePullRequest(targetTag string) *PullRequestData {
 	title := fmt.Sprintf(PullRequestTitleFormat, targetTag)
 
-	response, _ := api.sendGetRequest(config.QuorumAPIUrl + "/pulls?state=open&per_page=100")
+	response, _ := api.httpAdapter.sendGetRequest(config.QuorumAPIUrl + "/pulls?state=open&per_page=100")
 
 	var result []PullRequestData
 	jsonErr := json.Unmarshal(response, &result)
@@ -136,7 +138,7 @@ func (api *apiImpl) getPullRequests(commitChanges CommitChanges) []PullRequest {
 func (api *apiImpl) getPullRequestFiles(prData PullRequestData) []File {
 	url := fmt.Sprintf("%s/pulls/%d/files", config.GethGithubAPIUrl, prData.Number)
 
-	body, _ := api.sendGetRequest(url)
+	body, _ := api.httpAdapter.sendGetRequest(url)
 	var prFiles []File
 	jsonErr := json.Unmarshal(body, &prFiles)
 	if jsonErr != nil {
@@ -180,7 +182,7 @@ func (api *apiImpl) getPullRequestsData(shas []string) []PullRequestData {
 	concatenatedSha := strings.Join(shas, "+")
 
 	url := fmt.Sprintf("https://api.com/search/issues?q=repo:ethereum/go-ethereum+is:pr+is:merged+merged+%s", concatenatedSha)
-	body, _ := api.sendGetRequest(url)
+	body, _ := api.httpAdapter.sendGetRequest(url)
 
 	prResult := struct {
 		Items []PullRequestData
@@ -195,7 +197,7 @@ func (api *apiImpl) getPullRequestsData(shas []string) []PullRequestData {
 
 func (api *apiImpl) getCommitChanges(base string, target string) CommitChanges {
 	url := fmt.Sprintf("%s/compare/%s...%s", config.GethGithubAPIUrl, base, target)
-	body, _ := api.sendGetRequest(url)
+	body, _ := api.httpAdapter.sendGetRequest(url)
 
 	releaseCompare := CommitChanges{}
 	jsonErr := json.Unmarshal(body, &releaseCompare)
@@ -204,37 +206,4 @@ func (api *apiImpl) getCommitChanges(base string, target string) CommitChanges {
 	}
 
 	return releaseCompare
-}
-
-func (api *apiImpl) sendPostRequest(url string, body io.Reader) ([]byte, error) {
-	fmt.Println(url)
-	req, _ := http.NewRequest("POST", url, body)
-	return api.sendRequest(req)
-}
-
-func (api *apiImpl) sendGetRequest(url string) ([]byte, error) {
-	fmt.Println(url)
-	req, _ := http.NewRequest("GET", url, nil)
-	return api.sendRequest(req)
-}
-
-func (api *apiImpl) sendRequest(req *http.Request) ([]byte, error) {
-	req.SetBasicAuth(USERNAME, TOKEN)
-	req.Header.Add("Accept", "application/vnd.v3+json")
-	resp, _ := api.httpClient.Do(req)
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	// print HTTP headers
-	//for name, values := range resp.Header {
-	//	// Loop over all values for the name.
-	//	for _, value := range values {
-	//		fmt.Println(name, value)
-	//	}
-	//}
-
-	return body, nil
 }

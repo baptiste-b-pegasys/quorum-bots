@@ -42,7 +42,7 @@ func main() {
 	branchName := fmt.Sprintf("upgrade/go-ethereum/%s-%s", targetTag, time.Now().Format("2006102150405"))
 	git.CreateBranchFromGethTag(targetTag, branchName)
 
-	tagCompare := githubAPI.GetTagCompare(baseTag, targetTag)
+	tagCompare := githubAPI.GetGethTagComparison(baseTag, targetTag)
 
 	analysis := analysis.GetAnalysis(tagCompare, filesChangedByQuorum, expectedFileConflicts)
 
@@ -55,7 +55,7 @@ func main() {
 	builder.WriteString(markdown.CreateMarkdownAnalysisSection(analysis))
 	builder.WriteString("\n\n")
 
-	githubAPI.CreatePullRequest(branchName, releaseData, builder.String())
+	githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
 
 	fmt.Println("Done")
 }
