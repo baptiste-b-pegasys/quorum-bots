@@ -10,9 +10,6 @@ import (
 	"upgradebot/config"
 )
 
-const USERNAME = "ricardolyn"
-const TOKEN = "8b3d3c6b486590135699987e7e760de92575c8bf"
-
 const PullRequestTitleFormat = "[Upgrade] Go-Ethereum release %s"
 
 type GithubAPI interface {
@@ -28,7 +25,7 @@ type apiImpl struct {
 }
 
 func NewGithubAPI() GithubAPI {
-	client := &httpAdapter{}
+	client := newHttpAdapter()
 	return &apiImpl{
 		httpAdapter: client,
 	}
@@ -181,7 +178,7 @@ func (api *apiImpl) getPullRequestDataFromCommits(commitChanges CommitChanges) [
 func (api *apiImpl) getPullRequestsData(shas []string) []PullRequestData {
 	concatenatedSha := strings.Join(shas, "+")
 
-	url := fmt.Sprintf("https://api.com/search/issues?q=repo:ethereum/go-ethereum+is:pr+is:merged+merged+%s", concatenatedSha)
+	url := fmt.Sprintf("%s/search/issues?q=repo:ethereum/go-ethereum+is:pr+is:merged+merged+%s", config.GithubAPIUrl, concatenatedSha)
 	body, _ := api.httpAdapter.sendGetRequest(url)
 
 	prResult := struct {

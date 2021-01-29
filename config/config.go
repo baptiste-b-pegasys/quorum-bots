@@ -1,11 +1,13 @@
 package config
 
 const (
+	GithubAPIUrl = "https://api.github.com"
+
 	// Public
 	//QuorumGitRepo = "https://github.com/ConsenSys/quorum.git"
 	//QuorumAPIUrl     = "https://api.github.com/repos/ConsenSys/quorum"
 
-	// Private
+	// Private - swap to public URLs when ready to be used and stable
 	QuorumGitRepo = "git@github.com:ConsenSysQuorum/quorum.git"
 	QuorumAPIUrl  = "https://api.github.com/repos/ConsenSysQuorum/quorum"
 
