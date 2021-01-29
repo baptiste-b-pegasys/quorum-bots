@@ -42,9 +42,9 @@ VersionMeta  = "stable" // Version metadata to append to the version string
 
 */
 func GetBaseGethTag() string {
-	matcherMajor, _ := regexp.Compile("VersionMajor = (\\d+)")
-	matcherMinor, _ := regexp.Compile("VersionMinor = (\\d+)")
-	matcherPatch, _ := regexp.Compile("VersionPatch = (\\d+)")
+	matcherMajor, _ := regexp.Compile(`VersionMajor = (\d+)`)
+	matcherMinor, _ := regexp.Compile(`VersionMinor = (\d+)`)
+	matcherPatch, _ := regexp.Compile(`VersionPatch = (\d+)`)
 	out, err := ioutil.ReadFile(config.QuorumRepoFolder + config.QuorumVersionFilePath)
 	if err != nil {
 		log.Fatal("Error reading file " + config.QuorumVersionFilePath)

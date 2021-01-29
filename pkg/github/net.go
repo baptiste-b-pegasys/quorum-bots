@@ -35,7 +35,11 @@ func (adapter *httpAdapter) sendRequest(req *http.Request) ([]byte, error) {
 	log.Printf("%s %s\n", req.Method, req.URL)
 	req.SetBasicAuth(username, token)
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
-	resp, _ := adapter.httpClient.Do(req)
+	resp, err := adapter.httpClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
