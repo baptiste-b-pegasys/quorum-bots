@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 	"upgradebot/pkg/analysis"
@@ -11,7 +12,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Gather information from Go-Ethereum release to prepare an upstream upgrade")
+	log.Println("Gather information from Go-Ethereum release to prepare an upstream upgrade")
 
 	githubAPI := github.NewGithubAPI()
 
@@ -24,18 +25,18 @@ func main() {
 
 	// Validate if we are already in the latest go-ethereum version
 	if baseTag == targetTag {
-		fmt.Printf("We are already in the latest version %s. Ignore\n", baseTag)
+		log.Printf("We are already in the latest version %s. Ignore\n", baseTag)
 		return
 	}
 
 	// Validate if we don't have any PR already opened for an upgrade of the new version
 	openPr := githubAPI.FindOpenUpgradePullRequest(targetTag)
 	if openPr != nil {
-		fmt.Printf("There is already a PR on %s. Ignore\n", openPr.HtmlUrl)
+		log.Printf("There is already a PR on %s. Ignore\n", openPr.HtmlUrl)
 		return
 	}
 
-	fmt.Printf("Preparing release PR. Base version: %s. Target Version: %s\n", baseTag, targetTag)
+	log.Printf("Preparing release PR. Base version: %s. Target Version: %s\n", baseTag, targetTag)
 
 	// Analyse the quorum and go-ethereum changes to provide an overview of new features and PRs
 	filesChangedByQuorum := git.GetChangedFilesAgainstGethBaseVersion(baseTag)
@@ -57,5 +58,5 @@ func main() {
 	git.CreateBranchFromGethTag(targetTag, branchName)
 	createdPr := githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
 
-	fmt.Println("Done, PR: " + createdPr.HtmlUrl)
+	log.Println("Done, PR: " + createdPr.HtmlUrl)
 }

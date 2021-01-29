@@ -81,6 +81,6 @@ func GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string {
 func executeGitCommandOnRepo(arg ...string) ([]byte, error) {
 	cmd := exec.Command("git", arg...)
 	cmd.Dir = config.QuorumRepoFolder
-	fmt.Println(cmd.String())
+	log.Println(cmd.String())
 	return cmd.Output()
 }
