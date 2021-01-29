@@ -24,8 +24,8 @@ type Assessment string
 
 const (
 	Good     Assessment = "Good"
-	Warning             = "Warning"
-	Conflict            = "Conflict"
+	Warning  Assessment = "Warning"
+	Conflict Assessment = "Conflict"
 )
 
 type PackageStats struct {

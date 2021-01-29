@@ -3,8 +3,6 @@
 run:
   timeout: 2m
   tests: true
-  # default is true. Enables skipping of directories:
-  #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
   skip-dirs-use-default: true
 
 linters:
@@ -17,9 +15,9 @@ linters:
     - govet
     - ineffassign
     - misspell
-    # - staticcheck
+    - staticcheck
     - unconvert
-    # - unused
+    - unused
     - varcheck
 
 linters-settings:
@@ -28,18 +26,3 @@ linters-settings:
   goconst:
     min-len: 3 # minimum length of string constant
     min-occurrences: 6 # minimum number of occurrences
-
-issues:
-  exclude-rules:
-    - path: crypto/blake2b/
-      linters:
-        - deadcode
-    - path: crypto/bn256/cloudflare
-      linters:
-        - deadcode
-    - path: p2p/discv5/
-      linters:
-        - deadcode
-    - path: core/vm/instructions_test.go
-      linters:
-        - goconst
