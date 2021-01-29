@@ -50,4 +50,4 @@ jobs:
       - name: 'Run code linters'
         run: |
           make lint
-   
+
