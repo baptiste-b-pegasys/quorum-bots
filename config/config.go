@@ -7,7 +7,7 @@ const (
 	//QuorumGitRepo = "https://github.com/ConsenSys/quorum.git"
 	//QuorumAPIUrl     = "https://api.github.com/repos/ConsenSys/quorum"
 
-	// Private - swap to public URLs when ready to be used and stable
+	// Private - TODO: swap to public URLs when ready to be used and stable
 	QuorumGitRepo = "git@github.com:ConsenSysQuorum/quorum.git"
 	QuorumAPIUrl  = "https://api.github.com/repos/ConsenSysQuorum/quorum"
 
