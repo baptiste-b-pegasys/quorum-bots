@@ -51,7 +51,10 @@ func (api *apiImpl) GetNextReleaseFrom(baseTag string) ReleaseData {
 
 // GetAllGethReleases - get all go-ethereum releases
 func (api *apiImpl) GetAllGethReleases() []ReleaseData {
-	body, _ := api.httpAdapter.sendGetRequest(config.GethGithubAPIUrl + "/releases")
+	body, err := api.httpAdapter.sendGetRequest(config.GethGithubAPIUrl + "/releases")
+	if err != nil {
+		log.Fatal(err)
+	}
 	var data []ReleaseData
 
 	jsonErr := json.Unmarshal(body, &data)
@@ -66,7 +69,10 @@ func (api *apiImpl) GetAllGethReleases() []ReleaseData {
 func (api *apiImpl) GetGethReleaseData(tag string) ReleaseData {
 	url := fmt.Sprintf("%s/releases/tags/%s", config.GethGithubAPIUrl, tag)
 
-	body, _ := api.httpAdapter.sendGetRequest(url)
+	body, err := api.httpAdapter.sendGetRequest(url)
+	if err != nil {
+		log.Fatal(err)
+	}
 	data := ReleaseData{}
 
 	jsonErr := json.Unmarshal(body, &data)
@@ -88,8 +94,14 @@ func (api *apiImpl) GetGethTagComparison(base string, target string) TagCompare 
 func (api *apiImpl) CreateQuorumPullRequest(branchName string, data ReleaseData, prBody string) PullRequestData {
 	title := fmt.Sprintf(PullRequestTitleFormat, data.Tag)
 	createPrBody := CreatePullRequest{Title: title, Body: prBody, Base: "master", Head: branchName, Draft: true}
-	jsonBody, _ := json.Marshal(createPrBody)
-	response, _ := api.httpAdapter.sendPostRequest(config.QuorumAPIUrl+"/pulls", bytes.NewBuffer(jsonBody))
+	jsonBody, marshalErr := json.Marshal(createPrBody)
+	if marshalErr != nil {
+		log.Fatal(marshalErr)
+	}
+	response, err := api.httpAdapter.sendPostRequest(config.QuorumAPIUrl+"/pulls", bytes.NewBuffer(jsonBody))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	result := PullRequestData{}
 	jsonErr := json.Unmarshal(response, &result)
@@ -179,7 +191,10 @@ func (api *apiImpl) getPullRequestsData(shas []string) []PullRequestData {
 	concatenatedSha := strings.Join(shas, "+")
 
 	url := fmt.Sprintf("%s/search/issues?q=repo:ethereum/go-ethereum+is:pr+is:merged+merged+%s", config.GithubAPIUrl, concatenatedSha)
-	body, _ := api.httpAdapter.sendGetRequest(url)
+	body, err := api.httpAdapter.sendGetRequest(url)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	prResult := struct {
 		Items []PullRequestData

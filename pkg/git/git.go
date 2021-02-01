@@ -12,7 +12,10 @@ import (
 
 // CloneQuorumRepository - clone the repository of Quorum locally and add the go-ethereum remote as `geth`
 func CloneQuorumRepository() {
-	exec.Command("git", "clone", config.QuorumGitRepo, config.QuorumRepoFolder).Run()
+	err := exec.Command("git", "clone", config.QuorumGitRepo, config.QuorumRepoFolder).Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// load geth tags
 	executeGitCommandOnRepo("remote", "add", "geth", config.GethGitRepo)
@@ -47,7 +50,7 @@ func GetBaseGethTag() string {
 	matcherPatch, _ := regexp.Compile(`VersionPatch = (\d+)`)
 	out, err := ioutil.ReadFile(config.QuorumRepoFolder + config.QuorumVersionFilePath)
 	if err != nil {
-		log.Fatal("Error reading file " + config.QuorumVersionFilePath)
+		log.Fatal("Error reading file "+config.QuorumVersionFilePath, err)
 	}
 	fileStr := string(out)
 
@@ -67,7 +70,10 @@ func GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
 	executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", targetGethTag)
 	defer executeGitCommandOnRepo("merge", "--abort")
 
-	output, _ := executeGitCommandOnRepo("diff", "--name-only", "--diff-filter=U")
+	output, err := executeGitCommandOnRepo("diff", "--name-only", "--diff-filter=U")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return strings.Split(string(output), "\n")
 }

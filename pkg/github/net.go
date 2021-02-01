@@ -22,12 +22,18 @@ func newHttpAdapter() *httpAdapter {
 }
 
 func (adapter *httpAdapter) sendPostRequest(url string, body io.Reader) ([]byte, error) {
-	req, _ := http.NewRequest("POST", url, body)
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return nil, err
+	}
 	return adapter.sendRequest(req)
 }
 
 func (adapter *httpAdapter) sendGetRequest(url string) ([]byte, error) {
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
 	return adapter.sendRequest(req)
 }
 
@@ -37,7 +43,6 @@ func (adapter *httpAdapter) sendRequest(req *http.Request) ([]byte, error) {
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	resp, err := adapter.httpClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
