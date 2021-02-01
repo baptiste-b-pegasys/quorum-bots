@@ -7,14 +7,14 @@ import (
 	"time"
 	"upgradebot/pkg/analysis"
 	"upgradebot/pkg/git"
-	"upgradebot/pkg/github"
+	"upgradebot/pkg/github/http"
 	"upgradebot/pkg/markdown"
 )
 
 func main() {
 	log.Println("Gather information from Go-Ethereum release to prepare an upstream upgrade")
 
-	githubAPI := github.NewGithubAPI()
+	githubAPI := http.NewGithub()
 
 	git.CloneQuorumRepository()
 	defer git.ClearQuorumRepository()

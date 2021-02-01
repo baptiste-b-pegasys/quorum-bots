@@ -14,10 +14,8 @@ func CreateMarkdownHeader() string {
 
 	builder.WriteString("### Tasks to be done\n\n")
 
-	builder.WriteString("- [ ] Assign someone responsible for this go-ethereum upstream upgrade to the PR\n")
 	builder.WriteString("- [ ] Review new features and fixes on the Release Notes\n")
 	builder.WriteString("- [ ] Review Pull Requests in the analysis️\n")
-	builder.WriteString("- [ ] Review new features need to be updated or enhanced for Quorum\n")
 	builder.WriteString("- [ ] Solve all conflicts\n")
 	builder.WriteString("- [ ] Review if new unit tests or Acceptance Tests are required\n")
 	builder.WriteString("- [ ] Document in the Extra Changes section any changes or new code that was added as part of this PR\n")
@@ -25,6 +23,8 @@ func CreateMarkdownHeader() string {
 	builder.WriteString("\n\n")
 
 	builder.WriteString("### Extra Changes\n\n")
+
+	builder.WriteString("Specify in this section the necessary changes done to adapt the Quorum code to the new changes from Go-Ethereum or vice-versa.\n\n")
 
 	builder.WriteString("* **\\<Example\\>**: \\<change\\>\n")
 
