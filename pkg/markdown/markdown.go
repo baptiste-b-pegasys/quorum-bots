@@ -10,23 +10,28 @@ import (
 func CreateMarkdownHeader() string {
 	builder := strings.Builder{}
 
-	builder.WriteString("## Actions\n\n")
+	builder.WriteString("## TODO\n\n")
 
-	builder.WriteString("### Tasks to be done\n\n")
+	builder.WriteString("### Plan & Analyse\n\n")
 
-	builder.WriteString("- [ ] Review new features and fixes on the Release Notes\n")
-	builder.WriteString("- [ ] Review Pull Requests in the analysis️\n")
-	builder.WriteString("- [ ] Solve all conflicts\n")
-	builder.WriteString("- [ ] Review if new unit tests or Acceptance Tests are required\n")
-	builder.WriteString("- [ ] Document in the Extra Changes section any changes or new code that was added as part of this PR\n")
+	builder.WriteString("- [ ] Review the Release Notes\n")
+	builder.WriteString("- [ ] Review PRs in the section below\n\n")
+
+	builder.WriteString("As you review, list extra changes and/or tests to be implemented to ensure compatibility with GoQuorum specific features.\n\n")
+
+	builder.WriteString("### Build & Test\n\n")
+
+	builder.WriteString("- [ ] Pull and checkout PR branch locally, then merge GoQuorum `master` into this branch\n")
+	builder.WriteString("- [ ] Resolve conflicts, taking into account the prior analysis\n")
+	builder.WriteString("- [ ] Implement required changes until all unit tests pass\n")
+	builder.WriteString("- [ ] Implement required changes until acceptance tests pass\n")
+	builder.WriteString("- [ ] Implement extra changes and/or tests\n")
 
 	builder.WriteString("\n\n")
 
-	builder.WriteString("### Extra Changes\n\n")
+	builder.WriteString("### Extra Changes & Tests\n\n")
 
-	builder.WriteString("Specify in this section the necessary changes done to adapt the Quorum code to the new changes from Go-Ethereum or vice-versa.\n\n")
-
-	builder.WriteString("* **\\<Example\\>**: \\<change\\>\n")
+	builder.WriteString("* **\\<Example title\\>**: \\<example description of change/test\\>\n")
 
 	builder.WriteString("\n\n")
 
@@ -36,7 +41,7 @@ func CreateMarkdownHeader() string {
 func CreateMarkdownReleaseSection(data github.ReleaseData) string {
 	builder := strings.Builder{}
 
-	fmt.Fprintf(&builder, "## Summary of: %s\n\n", data.Name)
+	fmt.Fprintf(&builder, "## Go-Ethereum Release: %s\n\n", data.Name)
 
 	fmt.Fprintf(&builder, "* Version: %s\n", data.Tag)
 	fmt.Fprintf(&builder, "* Published: %s\n", data.PublishedAt)
@@ -53,7 +58,7 @@ func CreateMarkdownReleaseSection(data github.ReleaseData) string {
 func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 	builder := strings.Builder{}
 
-	builder.WriteString("## Analysis\n\n")
+	builder.WriteString("## Codebase changes assesment\n\n")
 
 	fmt.Fprintf(&builder, "### Legend\n\n")
 
@@ -67,7 +72,7 @@ func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 
 	builder.WriteString("\n\n")
 
-	fmt.Fprintf(&builder, "### Summary of %d merged Pull Requests\n\n", len(analysis.PrStats))
+	fmt.Fprintf(&builder, "### %d Pull Requests\n\n", len(analysis.PrStats))
 
 	builder.WriteString("\n\n")
 
@@ -88,7 +93,7 @@ func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 
 	builder.WriteString("\n\n")
 
-	builder.WriteString("### Summary of Changed files\n\n")
+	fmt.Fprintf(&builder, "### %d Changed files\n\n", len(analysis.FileStats))
 
 	builder.WriteString("| 🔍 | File | Lines Changed | Linked PR |\n")
 	builder.WriteString("| :--- | :--- | :--- | :--- |\n")
