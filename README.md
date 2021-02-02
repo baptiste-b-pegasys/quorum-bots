@@ -6,5 +6,10 @@ This tool is configured to run daily and target the https://github.com/ConsenSys
 
 ### Run
 
+You need to set environment variables to access the github API:
+ * `GITHUB_USERNAME`: github username
+ * `GITHUB_USER_TOKEN`: token created for that username with access to checkout projects and create PRs.
+
+Run project:
 `make run`
 
