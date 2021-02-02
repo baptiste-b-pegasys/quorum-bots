@@ -58,7 +58,7 @@ func CreateMarkdownReleaseSection(data github.ReleaseData) string {
 func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 	builder := strings.Builder{}
 
-	builder.WriteString("## Codebase changes assesment\n\n")
+	builder.WriteString("## Codebase changes assessment\n\n")
 
 	fmt.Fprintf(&builder, "### Legend\n\n")
 
