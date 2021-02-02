@@ -5,19 +5,19 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"upgradebot/config"
 )
-
-const username = "ricardolyn"
-const token = "8b3d3c6b486590135699987e7e760de92575c8bf"
 
 type HTTPClient struct {
 	httpClient *http.Client
+	config     *config.Config
 }
 
-func newHttpAdapter() *HTTPClient {
+func newHttpAdapter(config *config.Config) *HTTPClient {
 	client := &http.Client{}
 	return &HTTPClient{
 		httpClient: client,
+		config:     config,
 	}
 }
 
@@ -58,7 +58,7 @@ func (adapter *HTTPClient) deserialize(resp *http.Response) ([]byte, error) {
 
 func (adapter *HTTPClient) do(req *http.Request) (*http.Response, error) {
 	log.Printf("%s %s\n", req.Method, req.URL)
-	req.SetBasicAuth(username, token)
+	req.SetBasicAuth(adapter.config.GithubUsername, adapter.config.GithubUserToken)
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	resp, err := adapter.httpClient.Do(req)
 	if err != nil {

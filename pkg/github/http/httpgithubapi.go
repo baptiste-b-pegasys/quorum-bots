@@ -15,12 +15,14 @@ const PullRequestTitleFormat = "[Upgrade] Go-Ethereum release %s"
 
 type HTTPGithub struct {
 	httpAdapter *HTTPClient
+	config      *config.Config
 }
 
-func NewGithub() github.Github {
-	client := newHttpAdapter()
+func NewGithub(config *config.Config) github.Github {
+	client := newHttpAdapter(config)
 	return &HTTPGithub{
 		httpAdapter: client,
+		config:      config,
 	}
 }
 
@@ -44,7 +46,7 @@ func (api *HTTPGithub) GetNextReleaseFrom(baseTag string) github.ReleaseData {
 
 // GetAllGethReleases - get all go-ethereum releases
 func (api *HTTPGithub) GetAllGethReleases() []github.ReleaseData {
-	body, err := api.httpAdapter.DoGet(config.GethGithubAPIUrl + "/releases")
+	body, err := api.httpAdapter.DoGet(api.config.GethGithubAPIUrl + "/releases")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +57,7 @@ func (api *HTTPGithub) GetAllGethReleases() []github.ReleaseData {
 
 // GetGethReleaseData - get go-ethereum release data based on a tag
 func (api *HTTPGithub) GetGethReleaseData(tag string) github.ReleaseData {
-	url := fmt.Sprintf("%s/releases/tags/%s", config.GethGithubAPIUrl, tag)
+	url := fmt.Sprintf("%s/releases/tags/%s", api.config.GethGithubAPIUrl, tag)
 
 	body, err := api.httpAdapter.DoGet(url)
 	if err != nil {
@@ -88,7 +90,7 @@ func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.Re
 	if readerErr != nil {
 		log.Fatal(readerErr)
 	}
-	response, err := api.httpAdapter.DoPost(config.QuorumAPIUrl+"/pulls", jsonReader)
+	response, err := api.httpAdapter.DoPost(api.config.QuorumAPIUrl+"/pulls", jsonReader)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -102,7 +104,7 @@ func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.Re
 func (api *HTTPGithub) FindOpenUpgradePullRequest(targetTag string) *github.PullRequestData {
 	title := fmt.Sprintf(PullRequestTitleFormat, targetTag)
 
-	response, _ := api.httpAdapter.DoGet(config.QuorumAPIUrl + "/pulls?state=open&per_page=100")
+	response, _ := api.httpAdapter.DoGet(api.config.QuorumAPIUrl + "/pulls?state=open&per_page=100")
 
 	var result []github.PullRequestData
 	parseJson(response, &result)
@@ -129,7 +131,7 @@ func (api *HTTPGithub) getPullRequests(commitChanges github.CommitChanges) []git
 }
 
 func (api *HTTPGithub) getPullRequestFiles(prData github.PullRequestData) []github.File {
-	url := fmt.Sprintf("%s/pulls/%d/files", config.GethGithubAPIUrl, prData.Number)
+	url := fmt.Sprintf("%s/pulls/%d/files", api.config.GethGithubAPIUrl, prData.Number)
 
 	body, _ := api.httpAdapter.DoGet(url)
 	var prFiles []github.File
@@ -170,7 +172,7 @@ func (api *HTTPGithub) getPullRequestDataFromCommits(commitChanges github.Commit
 func (api *HTTPGithub) getPullRequestsData(shas []string) []github.PullRequestData {
 	concatenatedSha := strings.Join(shas, "+")
 
-	url := fmt.Sprintf("%s/search/issues?q=repo:ethereum/go-ethereum+is:pr+is:merged+merged+%s", config.GithubAPIUrl, concatenatedSha)
+	url := fmt.Sprintf("%s/search/issues?q=repo:ethereum/go-ethereum+is:pr+is:merged+merged+%s", api.config.GithubAPIUrl, concatenatedSha)
 	body, err := api.httpAdapter.DoGet(url)
 	if err != nil {
 		log.Fatal(err)
@@ -185,7 +187,7 @@ func (api *HTTPGithub) getPullRequestsData(shas []string) []github.PullRequestDa
 }
 
 func (api *HTTPGithub) getCommitChanges(base string, target string) github.CommitChanges {
-	url := fmt.Sprintf("%s/compare/%s...%s", config.GethGithubAPIUrl, base, target)
+	url := fmt.Sprintf("%s/compare/%s...%s", api.config.GethGithubAPIUrl, base, target)
 	body, _ := api.httpAdapter.DoGet(url)
 
 	releaseCompare := github.CommitChanges{}

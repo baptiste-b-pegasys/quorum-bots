@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"upgradebot/config"
 	"upgradebot/pkg/analysis"
 	"upgradebot/pkg/git"
 	"upgradebot/pkg/github/http"
@@ -14,7 +15,9 @@ import (
 func main() {
 	log.Println("Gather information from Go-Ethereum release to prepare an upstream upgrade")
 
-	githubAPI := http.NewGithub()
+	cfg := config.GetConfig()
+	githubAPI := http.NewGithub(cfg)
+	git := git.NewGit(cfg)
 
 	git.CloneQuorumRepository()
 	defer git.ClearQuorumRepository()

@@ -10,27 +10,35 @@ import (
 	"upgradebot/config"
 )
 
+type Git struct {
+	config *config.Config
+}
+
+func NewGit(config *config.Config) *Git {
+	return &Git{config: config}
+}
+
 // CloneQuorumRepository - clone the repository of Quorum locally and add the go-ethereum remote as `geth`
-func CloneQuorumRepository() {
-	err := exec.Command("git", "clone", config.QuorumGitRepo, config.QuorumRepoFolder).Run()
+func (s *Git) CloneQuorumRepository() {
+	err := exec.Command("git", "clone", s.config.QuorumGitRepo, s.config.QuorumRepoFolder).Run()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// load geth tags
-	executeGitCommandOnRepo("remote", "add", "geth", config.GethGitRepo)
-	executeGitCommandOnRepo("fetch", "geth", "--tags")
+	s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
+	s.executeGitCommandOnRepo("fetch", "geth", "--tags")
 }
 
 // ClearQuorumRepository - delete the repository folder
-func ClearQuorumRepository() {
-	exec.Command("rm", "-rf", config.QuorumRepoFolder).Run()
+func (s *Git) ClearQuorumRepository() {
+	exec.Command("rm", "-rf", s.config.QuorumRepoFolder).Run()
 }
 
 // CreateBranchFromGethTag - create a branch from a geth tag and push the branch to the remote quorum
-func CreateBranchFromGethTag(targetTag string, branchName string) {
-	executeGitCommandOnRepo("checkout", "tags/"+targetTag, "-b", branchName)
-	executeGitCommandOnRepo("push", "-u", "origin", branchName)
+func (s *Git) CreateBranchFromGethTag(targetTag string, branchName string) {
+	s.executeGitCommandOnRepo("checkout", "tags/"+targetTag, "-b", branchName)
+	s.executeGitCommandOnRepo("push", "-u", "origin", branchName)
 }
 
 /**
@@ -44,18 +52,18 @@ VersionPatch = 8        // Patch version component of the current release
 VersionMeta  = "stable" // Version metadata to append to the version string
 
 */
-func GetBaseGethTag() string {
+func (s *Git) GetBaseGethTag() string {
 	matcherMajor, _ := regexp.Compile(`VersionMajor = (\d+)`)
 	matcherMinor, _ := regexp.Compile(`VersionMinor = (\d+)`)
 	matcherPatch, _ := regexp.Compile(`VersionPatch = (\d+)`)
-	out, err := ioutil.ReadFile(config.QuorumRepoFolder + config.QuorumVersionFilePath)
+	out, err := ioutil.ReadFile(s.config.QuorumRepoFolder + s.config.QuorumVersionFilePath)
 	if err != nil {
-		log.Fatal("Error reading file "+config.QuorumVersionFilePath, err)
+		log.Fatal("Error reading file "+s.config.QuorumVersionFilePath, err)
 	}
 	fileStr := string(out)
 
 	if !matcherMajor.MatchString(fileStr) || !matcherMinor.MatchString(fileStr) || !matcherPatch.MatchString(fileStr) {
-		log.Fatal("Failed to find the Geth version inside " + config.QuorumVersionFilePath)
+		log.Fatal("Failed to find the Geth version inside " + s.config.QuorumVersionFilePath)
 	}
 
 	majorVersion := matcherMajor.FindStringSubmatch(fileStr)[1]
@@ -66,11 +74,11 @@ func GetBaseGethTag() string {
 }
 
 // GetConflictsFilesAgainstGethTargetVersion - Get the list of filenames that will have conflicts between Quorum master and the target geth tag
-func GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
-	executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", targetGethTag)
-	defer executeGitCommandOnRepo("merge", "--abort")
+func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
+	s.executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", targetGethTag)
+	defer s.executeGitCommandOnRepo("merge", "--abort")
 
-	output, err := executeGitCommandOnRepo("diff", "--name-only", "--diff-filter=U")
+	output, err := s.executeGitCommandOnRepo("diff", "--name-only", "--diff-filter=U")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,14 +87,14 @@ func GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
 }
 
 // GetChangedFilesAgainstGethBaseVersion - Get the list of filenames that were changed by quorum when comparing with the same geth tag currently merged into quorum
-func GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string {
-	output, _ := executeGitCommandOnRepo("diff", "--name-only", baseGethTag)
+func (s *Git) GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string {
+	output, _ := s.executeGitCommandOnRepo("diff", "--name-only", baseGethTag)
 	return strings.Split(string(output), "\n")
 }
 
-func executeGitCommandOnRepo(arg ...string) ([]byte, error) {
+func (s *Git) executeGitCommandOnRepo(arg ...string) ([]byte, error) {
 	cmd := exec.Command("git", arg...)
-	cmd.Dir = config.QuorumRepoFolder
+	cmd.Dir = s.config.QuorumRepoFolder
 	log.Println(cmd.String())
 	return cmd.Output()
 }
