@@ -23,15 +23,17 @@ func CreateMarkdownHeader() string {
 
 	builder.WriteString("- [ ] Pull and checkout PR branch locally, then merge GoQuorum `master` into this branch\n")
 	builder.WriteString("- [ ] Resolve conflicts, taking into account the prior analysis\n")
+	builder.WriteString("- [ ] Implement required changes until lint passes\n")
 	builder.WriteString("- [ ] Implement required changes until all unit tests pass\n")
 	builder.WriteString("- [ ] Implement required changes until acceptance tests pass\n")
 	builder.WriteString("- [ ] Implement extra changes and/or tests\n")
+	builder.WriteString("- [ ] Verify any left TODOs in the code\n")
 
 	builder.WriteString("\n\n")
 
 	builder.WriteString("### Extra Changes & Tests\n\n")
 
-	builder.WriteString("* **\\<Example title\\>**: \\<example description of change/test\\>\n")
+	builder.WriteString("- [ ] Example title: example description of change/test\n")
 
 	builder.WriteString("\n\n")
 
