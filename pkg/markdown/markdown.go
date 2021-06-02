@@ -3,8 +3,9 @@ package markdown
 import (
 	"fmt"
 	"strings"
-	"upgradebot/pkg/analysis"
-	"upgradebot/pkg/github"
+
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/analysis"
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/github"
 )
 
 func CreateMarkdownHeader() string {
