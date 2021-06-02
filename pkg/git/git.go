@@ -27,23 +27,16 @@ func (s *Git) CloneQuorumRepository() {
 		return
 	}
 
-	out, err := s.executeCommandOnRepo("ls", "-l")
-	if err != nil {
-		log.Fatalf("ls -l: %v", err)
-		return
-	}
-	log.Print(string(out))
-
 	// load geth tags
-	_, err = s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
+	out, err := s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
 	if err != nil {
-		log.Fatalf("git remote add: %v", err)
+		log.Fatalf("git remote add: %v\n%s", err, string(out))
 		return
 	}
 
-	_, err = s.executeGitCommandOnRepo("fetch", "geth", "--tags")
+	out, err = s.executeGitCommandOnRepo("fetch", "geth", "--tags")
 	if err != nil {
-		log.Fatalf("git fetch geth: %v", err)
+		log.Fatalf("git fetch geth: %v\n%s", err, string(out))
 		return
 	}
 }
