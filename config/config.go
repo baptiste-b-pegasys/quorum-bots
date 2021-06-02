@@ -30,18 +30,20 @@ var (
 
 func GetConfig() *Config {
 	once.Do(func() {
+		githubUsername := os.Getenv("GITHUB_USERNAME")
+		githubToken := os.Getenv("GITHUB_USER_TOKEN")
 		instance = &Config{
 			GithubAPIUrl: "https://api.github.com",
 			GithubLabel:  "geth upstream upgrade",
 
-			GithubUsername:  os.Getenv("GITHUB_USERNAME"),
-			GithubUserToken: os.Getenv("GITHUB_USER_TOKEN"),
+			GithubUsername:  githubUsername,
+			GithubUserToken: githubToken,
 
 			GethGitRepo:      "https://github.com/ethereum/go-ethereum.git",
 			GethGithubAPIUrl: "https://api.github.com/repos/ethereum/go-ethereum",
 
-			QuorumGitRepo: "git@github.com:ConsenSys/quorum.git",
-			QuorumAPIUrl:  "https://api.github.com/repos/ConsenSys/quorum",
+			QuorumGitRepo: "https://" + githubUsername + ":" + githubToken + "@github.com/" + githubUsername + "/quorum.git",
+			QuorumAPIUrl:  "https://api.github.com/repos/" + githubUsername + "/quorum",
 
 			// For experimentation with the private Quorum repository
 			//QuorumGitRepo: "git@github.com:ConsenSysQuorum/quorum.git",

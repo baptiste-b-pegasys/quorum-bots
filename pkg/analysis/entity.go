@@ -1,7 +1,7 @@
 package analysis
 
 import (
-	"upgradebot/pkg/github"
+	"github.com/baptiste-b-pegasys/quorum-bots/pkg/github"
 )
 
 type PullRequestStats struct {

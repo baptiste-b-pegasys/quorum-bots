@@ -4,7 +4,8 @@ import (
 	"math"
 	"sort"
 	"strings"
-	"upgradebot/pkg/github"
+
+	"github.com/baptiste-b-pegasys/quorum-bots/pkg/github"
 )
 
 // GetAnalysis - create analysis that will provide
