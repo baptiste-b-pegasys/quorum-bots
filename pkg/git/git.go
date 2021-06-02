@@ -21,15 +21,15 @@ func NewGit(config *config.Config) *Git {
 
 // CloneQuorumRepository - clone the repository of Quorum locally and add the go-ethereum remote as `geth`
 func (s *Git) CloneQuorumRepository() {
-	err := exec.Command("git", "clone", s.config.QuorumGitRepo, s.config.QuorumRepoFolder).Run()
-	if err != nil {
-		log.Fatalf("git clone: %v", err)
+	cmd := exec.Command("git", "clone", s.config.QuorumGitRepo, s.config.QuorumRepoFolder)
+	out, err := cmd.Output()
+	if checkCmdError("git clone", cmd, out, err) {
 		return
 	}
 
 	// load geth tags
-	cmd := s.buildGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
-	out, err := cmd.Output()
+	cmd = s.buildGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
+	out, err = cmd.Output()
 	if checkCmdError("git remote add", cmd, out, err) {
 		return
 	}
