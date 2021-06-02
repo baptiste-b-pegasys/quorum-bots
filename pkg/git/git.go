@@ -24,16 +24,27 @@ func (s *Git) CloneQuorumRepository() {
 	err := exec.Command("git", "clone", s.config.QuorumGitRepo, s.config.QuorumRepoFolder).Run()
 	if err != nil {
 		log.Fatalf("git clone: %v", err)
+		return
 	}
+
+	out, err := s.executeCommandOnRepo("ls", "-l")
+	if err != nil {
+		log.Fatalf("ls -l: %v", err)
+		return
+	}
+	log.Print(string(out))
 
 	// load geth tags
 	_, err = s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
 	if err != nil {
 		log.Fatalf("git remote add: %v", err)
+		return
 	}
+
 	_, err = s.executeGitCommandOnRepo("fetch", "geth", "--tags")
 	if err != nil {
 		log.Fatalf("git fetch geth: %v", err)
+		return
 	}
 }
 
@@ -98,6 +109,13 @@ func (s *Git) GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string
 	output, _ := s.executeGitCommandOnRepo("diff", "--name-only", baseGethTag)
 	return strings.Split(string(output), "\n")
 }
+
+func (s *Git) executeCommandOnRepo(args ...string) ([]byte, error) {
+	cmd := exec.Command(args...)
+	cmd.Dir = s.config.QuorumRepoFolder
+	return cmd.Output()
+}
+
 
 func (s *Git) executeGitCommandOnRepo(arg ...string) ([]byte, error) {
 	cmd := exec.Command("git", arg...)
