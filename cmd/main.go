@@ -69,8 +69,8 @@ func main() {
 	if createdPr == nil {
 		log.Fatalf("create PR: response is nil")
 		return
-  }
-  if cfg.GithubLabel != "" {
+	}
+	if cfg.GithubLabel != "" {
 		_ = githubAPI.AddLabelsToIssue(createdPr.Number, cfg.GithubLabel)
 	}
 	log.Println("Done, PR: " + createdPr.HtmlUrl)

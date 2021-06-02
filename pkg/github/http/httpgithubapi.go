@@ -111,10 +111,12 @@ func (api *HTTPGithub) AddLabelsToIssue(issueNumber int, labels ...string) *gith
 	jsonReader, readerErr := newReader(labelsBody)
 	if readerErr != nil {
 		log.Fatal(readerErr)
+		return nil
 	}
 	response, err := api.httpAdapter.DoPost(fmt.Sprintf("%s/issues/%d/labels", api.config.QuorumAPIUrl, issueNumber), jsonReader)
 	if err != nil {
 		log.Fatal(err)
+		return nil
 	}
 
 	result := &github.LabelsRequestData{}
