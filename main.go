@@ -20,6 +20,8 @@ func main() {
 	githubAPI := http.NewGithub(cfg)
 	git := git.NewGit(cfg)
 
+	log.Printf("debug: %+v", cfg)
+
 	git.CloneQuorumRepository()
 	defer git.ClearQuorumRepository()
 
