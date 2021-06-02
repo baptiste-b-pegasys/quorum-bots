@@ -60,7 +60,14 @@ func main() {
 	// Create new branch and the  upgrade PR
 	branchName := fmt.Sprintf("upgrade/go-ethereum/%s-%s", targetTag, time.Now().Format("2006102150405"))
 	git.CreateBranchFromGethTag(targetTag, branchName)
-	createdPr := githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
-
+	createdPr, err := githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
+	if err != nil {
+		log.Fatalf("create PR: %v", err)
+		return
+	}
+	if createdPr == nil {
+		log.Fatalf("create PR: response is nil")
+		return
+	}
 	log.Println("Done, PR: " + createdPr.HtmlUrl)
 }

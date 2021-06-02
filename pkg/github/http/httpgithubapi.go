@@ -78,7 +78,7 @@ func (api *HTTPGithub) GetGethTagComparison(base string, target string) github.T
 }
 
 // CreateQuorumPullRequest - create PR in the quorum repo
-func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.ReleaseData, prBody string) github.PullRequestData {
+func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.ReleaseData, prBody string) (*github.PullRequestData, error) {
 	title := fmt.Sprintf(PullRequestTitleFormat, data.Tag)
 	createPrBody := github.CreatePullRequest{
 		Title: title,
@@ -87,19 +87,21 @@ func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.Re
 		Head:  branchName,
 		Draft: true,
 	}
-	jsonReader, readerErr := newReader(createPrBody)
-	if readerErr != nil {
-		log.Fatal(readerErr)
+
+	jsonReader, err := newReader(createPrBody)
+	if err != nil {
+		return nil, fmt.Errorf("json reader: %w", err)
 	}
+
 	response, err := api.httpAdapter.DoPost(api.config.QuorumAPIUrl+"/pulls", jsonReader)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("do post: %w", err)
 	}
 
-	result := github.PullRequestData{}
-	parseJson(response, &result)
+	result := &github.PullRequestData{}
+	parseJson(response, result)
 
-	return result
+	return result, nil
 }
 
 func (api *HTTPGithub) FindOpenUpgradePullRequest(targetTag string) *github.PullRequestData {
