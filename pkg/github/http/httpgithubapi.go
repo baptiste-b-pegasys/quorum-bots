@@ -104,6 +104,25 @@ func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.Re
 	return result, nil
 }
 
+// AddLabelsToIssue - adds some labels to the issue
+func (api *HTTPGithub) AddLabelsToIssue(issueNumber int, labels ...string) *github.LabelsRequestData {
+	// POST {{baseUrl}}/repos/:owner/:repo/issues/:issue_number/labels a JSON body labels -> array of strings
+	labelsBody := github.LabelsRequest{Labels: labels}
+	jsonReader, readerErr := newReader(labelsBody)
+	if readerErr != nil {
+		log.Fatal(readerErr)
+	}
+	response, err := api.httpAdapter.DoPost(fmt.Sprintf("%s/issues/%d/labels", api.config.QuorumAPIUrl, issueNumber), jsonReader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result := &github.LabelsRequestData{}
+	parseJson(response, result)
+
+	return result
+}
+
 func (api *HTTPGithub) FindOpenUpgradePullRequest(targetTag string) *github.PullRequestData {
 	title := fmt.Sprintf(PullRequestTitleFormat, targetTag)
 
