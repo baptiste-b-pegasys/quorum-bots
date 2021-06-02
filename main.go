@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/baptiste-b-pegasys/upgradebot/config"
-	"github.com/baptiste-b-pegasys/upgradebot/pkg/analysis"
-	"github.com/baptiste-b-pegasys/upgradebot/pkg/git"
-	"github.com/baptiste-b-pegasys/upgradebot/pkg/github/http"
-	"github.com/baptiste-b-pegasys/upgradebot/pkg/markdown"
+	"github.com/baptiste-b-pegasys/quorum-bots/config"
+	"github.com/baptiste-b-pegasys/quorum-bots/pkg/analysis"
+	"github.com/baptiste-b-pegasys/quorum-bots/pkg/git"
+	"github.com/baptiste-b-pegasys/quorum-bots/pkg/github/http"
+	"github.com/baptiste-b-pegasys/quorum-bots/pkg/markdown"
 )
 
 func main() {
