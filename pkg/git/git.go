@@ -34,7 +34,7 @@ func (s *Git) CloneQuorumRepository() {
 		return
 	}
 
-	cmd = s.buildGitCommandOnRepo("fetch", "geth", "--tags")
+	cmd = s.buildGitCommandOnRepo("fetch", "geth", "--tags", "-f")
 	out, err = cmd.Output()
 	if checkCmdError("git fetch tags", cmd, out, err) {
 		return
