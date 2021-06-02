@@ -35,11 +35,11 @@ func GetConfig() *Config {
 			GithubUsername:  os.Getenv("GITHUB_USERNAME"),
 			GithubUserToken: os.Getenv("GITHUB_USER_TOKEN"),
 
-			GethGitRepo:      "https://github.com/ethereum/go-ethereum.git",
-			GethGithubAPIUrl: "https://api.github.com/repos/ethereum/go-ethereum",
+			GethGitRepo:      "https://github.com/baptiste-b-pegasys/tst-bot-src.git",
+			GethGithubAPIUrl: "https://api.github.com/repos/baptiste-b-pegasys/tst-bot-src",
 
-			QuorumGitRepo: "git@github.com:ConsenSys/quorum.git",
-			QuorumAPIUrl:  "https://api.github.com/repos/ConsenSys/quorum",
+			QuorumGitRepo: "git@github.com:baptiste-b-pegasys/tst-bot-dst.git",
+			QuorumAPIUrl:  "https://api.github.com/repos/baptiste-b-pegasys/tst-bot-dst",
 
 			// For experimentation with the private Quorum repository
 			//QuorumGitRepo: "git@github.com:ConsenSysQuorum/quorum.git",
