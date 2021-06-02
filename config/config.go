@@ -30,16 +30,17 @@ var (
 func GetConfig() *Config {
 	once.Do(func() {
 		githubUsername := os.Getenv("GITHUB_USERNAME")
+		githubToken := os.Getenv("GITHUB_USER_TOKEN")
 		instance = &Config{
 			GithubAPIUrl: "https://api.github.com",
 
 			GithubUsername:  githubUsername,
-			GithubUserToken: os.Getenv("GITHUB_USER_TOKEN"),
+			GithubUserToken: githubToken,
 
 			GethGitRepo:      "https://github.com/ethereum/go-ethereum.git",
 			GethGithubAPIUrl: "https://api.github.com/repos/ethereum/go-ethereum",
 
-			QuorumGitRepo: "git@github.com:" + githubUsername + "/quorum.git",
+			QuorumGitRepo: "https://" + githubUsername + ":" + githubToken + "@github.com:" + githubUsername + "/quorum.git",
 			QuorumAPIUrl:  "https://api.github.com/repos/" + githubUsername + "/quorum",
 
 			// For experimentation with the private Quorum repository

@@ -130,6 +130,7 @@ func (s *Git) executeCommandOnRepo(args ...string) ([]byte, error) {
 	cmd.Dir = s.config.QuorumRepoFolder
 	return cmd.Output()
 }
+
 func (s *Git) executeGitCommandOnRepo(arg ...string) ([]byte, error) {
 	cmd := s.buildGitCommandOnRepo(arg...)
 	log.Println(cmd.String())
