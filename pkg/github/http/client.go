@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/baptiste-b-pegasys/quorum-bots/config"
+	"upgradebot/config"
 )
 
 type HTTPClient struct {

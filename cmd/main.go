@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/baptiste-b-pegasys/quorum-bots/config"
-	"github.com/baptiste-b-pegasys/quorum-bots/pkg/analysis"
-	"github.com/baptiste-b-pegasys/quorum-bots/pkg/git"
-	"github.com/baptiste-b-pegasys/quorum-bots/pkg/github/http"
-	"github.com/baptiste-b-pegasys/quorum-bots/pkg/markdown"
+	"upgradebot/config"
+	"upgradebot/pkg/analysis"
+	"upgradebot/pkg/git"
+	"upgradebot/pkg/github/http"
+	"upgradebot/pkg/markdown"
 )
 
 func main() {
@@ -60,7 +60,6 @@ func main() {
 	// Create new branch and the  upgrade PR
 	branchName := fmt.Sprintf("upgrade/go-ethereum/%s-%s", targetTag, time.Now().Format("2006102150405"))
 	git.CreateBranchFromGethTag(targetTag, branchName)
-
 	createdPr, err := githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
 	if err != nil {
 		log.Fatalf("create PR: %v", err)
@@ -71,7 +70,8 @@ func main() {
 		return
 	}
 	if cfg.GithubLabel != "" {
-		_ = githubAPI.AddLabelsToIssue(createdPr.Number, cfg.GithubLabel)
+		labelData := githubAPI.AddLabelsToIssue(createdPr.Number, cfg.GithubLabel)
+		log.Printf("labels: %+v\n", labelData)
 	}
 	log.Println("Done, PR: " + createdPr.HtmlUrl)
 }

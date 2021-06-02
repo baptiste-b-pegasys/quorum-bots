@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/baptiste-b-pegasys/quorum-bots/pkg/analysis"
-	"github.com/baptiste-b-pegasys/quorum-bots/pkg/github"
+	"upgradebot/pkg/analysis"
+	"upgradebot/pkg/github"
 )
 
 func CreateMarkdownHeader() string {
