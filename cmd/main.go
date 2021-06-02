@@ -61,5 +61,9 @@ func main() {
 	git.CreateBranchFromGethTag(targetTag, branchName)
 	createdPr := githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
 
+	if cfg.GithubLabel != "" {
+		_ = githubAPI.AddLabelsToIssue(createdPr.Number, cfg.GithubLabel)
+	}
+
 	log.Println("Done, PR: " + createdPr.HtmlUrl)
 }

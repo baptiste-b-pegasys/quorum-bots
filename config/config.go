@@ -9,6 +9,7 @@ var once sync.Once
 
 type Config struct {
 	GithubAPIUrl string
+	GithubLabel  string
 
 	QuorumGitRepo string
 	QuorumAPIUrl  string
@@ -31,6 +32,7 @@ func GetConfig() *Config {
 	once.Do(func() {
 		instance = &Config{
 			GithubAPIUrl: "https://api.github.com",
+			GithubLabel:  "geth upstream upgrade",
 
 			GithubUsername:  os.Getenv("GITHUB_USERNAME"),
 			GithubUserToken: os.Getenv("GITHUB_USER_TOKEN"),

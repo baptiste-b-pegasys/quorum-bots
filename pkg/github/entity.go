@@ -55,3 +55,19 @@ type CreatePullRequest struct {
 	Base  string `json:"base"`
 	Draft bool   `json:"draft"`
 }
+
+type LabelsRequestData []LabelRequestData
+
+type LabelRequestData struct {
+	ID          int    `json:"id"`
+	NodeID      string `json:"node_id"`
+	URL         string `json:"url"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Color       string `json:"color"`
+	Default     bool   `json:"default"`
+}
+
+type LabelsRequest struct {
+	Labels []string `json:"labels"`
+}

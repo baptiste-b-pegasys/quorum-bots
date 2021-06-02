@@ -6,4 +6,5 @@ type Github interface {
 	GetNextReleaseFrom(baseTag string) ReleaseData
 	CreateQuorumPullRequest(branchName string, data ReleaseData, prBody string) PullRequestData
 	FindOpenUpgradePullRequest(targetTag string) *PullRequestData
+	AddLabelsToIssue(issueNumber int, labels ...string) *LabelsRequestData
 }
