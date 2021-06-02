@@ -23,12 +23,18 @@ func NewGit(config *config.Config) *Git {
 func (s *Git) CloneQuorumRepository() {
 	err := exec.Command("git", "clone", s.config.QuorumGitRepo, s.config.QuorumRepoFolder).Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("git clone: %v", err)
 	}
 
 	// load geth tags
-	s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
-	s.executeGitCommandOnRepo("fetch", "geth", "--tags")
+	_, err = s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
+	if err != nil {
+		log.Fatalf("git remote add: %v", err)
+	}
+	_, err = s.executeGitCommandOnRepo("fetch", "geth", "--tags")
+	if err != nil {
+		log.Fatalf("git fetch geth: %v", err)
+	}
 }
 
 // ClearQuorumRepository - delete the repository folder
