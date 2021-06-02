@@ -28,17 +28,31 @@ func (s *Git) CloneQuorumRepository() {
 	}
 
 	// load geth tags
-	out, err := s.executeGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
-	if err != nil {
-		log.Fatalf("git remote add: %v\n%s", err, string(out))
+	cmd := s.buildGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
+	out, err := cmd.Output()
+	if checkCmdError("git remote add", cmd, out, err) {
 		return
 	}
 
-	out, err = s.executeGitCommandOnRepo("fetch", "geth", "--tags")
-	if err != nil {
-		log.Fatalf("git fetch geth: %v\n%s", err, string(out))
+	cmd = s.buildGitCommandOnRepo("fetch", "geth", "--tags")
+	out, err = cmd.Output()
+	if checkCmdError("git fetch tags", cmd, out, err) {
 		return
 	}
+}
+
+func checkCmdError(reason string, cmd *exec.Cmd, out []byte, err error) bool {
+	if err == nil {
+		return false
+	}
+	log.Printf("env: %+v", cmd.Env)
+	switch err := err.(type) {
+	case *exec.ExitError:
+		log.Fatalf("%s: %s: %v\n%s\n%s", reason, cmd.String(), err, string(out), string(err.Stderr))
+	default:
+		log.Fatalf("%s: %s: %v\n%s", reason, cmd.String(), err, string(out))
+	}
+	return true
 }
 
 // ClearQuorumRepository - delete the repository folder
@@ -108,10 +122,14 @@ func (s *Git) executeCommandOnRepo(args ...string) ([]byte, error) {
 	cmd.Dir = s.config.QuorumRepoFolder
 	return cmd.Output()
 }
-
 func (s *Git) executeGitCommandOnRepo(arg ...string) ([]byte, error) {
-	cmd := exec.Command("git", arg...)
-	cmd.Dir = s.config.QuorumRepoFolder
+	cmd := s.buildGitCommandOnRepo(arg...)
 	log.Println(cmd.String())
 	return cmd.Output()
+}
+
+func (s *Git) buildGitCommandOnRepo(arg ...string) *exec.Cmd {
+	cmd := exec.Command("git", arg...)
+	cmd.Dir = s.config.QuorumRepoFolder
+	return cmd
 }
