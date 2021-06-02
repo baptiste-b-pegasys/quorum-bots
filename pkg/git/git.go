@@ -62,8 +62,16 @@ func (s *Git) ClearQuorumRepository() {
 
 // CreateBranchFromGethTag - create a branch from a geth tag and push the branch to the remote quorum
 func (s *Git) CreateBranchFromGethTag(targetTag string, branchName string) {
-	s.executeGitCommandOnRepo("checkout", "tags/"+targetTag, "-b", branchName)
-	s.executeGitCommandOnRepo("push", "-u", "origin", branchName)
+	cmd := s.buildGitCommandOnRepo("checkout", "tags/"+targetTag, "-b", branchName)
+	out, err := cmd.Output()
+	if checkCmdError("git checkout tags", cmd, out, err) {
+		return
+	}
+	cmd = s.buildGitCommandOnRepo("push", "-u", "origin", branchName)
+	out, err = cmd.Output()
+	if checkCmdError("git push", cmd, out, err) {
+		return
+	}
 }
 
 /**
