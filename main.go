@@ -5,11 +5,12 @@ import (
 	"log"
 	"strings"
 	"time"
-	"upgradebot/config"
-	"upgradebot/pkg/analysis"
-	"upgradebot/pkg/git"
-	"upgradebot/pkg/github/http"
-	"upgradebot/pkg/markdown"
+
+	"github.com/baptiste-b-pegasys/upgradebot/config"
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/analysis"
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/git"
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/github/http"
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/markdown"
 )
 
 func main() {

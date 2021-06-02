@@ -7,8 +7,9 @@ import (
 	"log"
 	"math"
 	"strings"
-	"upgradebot/config"
-	"upgradebot/pkg/github"
+
+	"github.com/baptiste-b-pegasys/upgradebot/config"
+	"github.com/baptiste-b-pegasys/upgradebot/pkg/github"
 )
 
 const PullRequestTitleFormat = "[Upgrade] Go-Ethereum release %s"

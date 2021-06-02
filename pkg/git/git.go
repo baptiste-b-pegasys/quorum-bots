@@ -7,7 +7,8 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
-	"upgradebot/config"
+
+	"github.com/baptiste-b-pegasys/upgradebot/config"
 )
 
 type Git struct {

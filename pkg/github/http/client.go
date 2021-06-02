@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"upgradebot/config"
+
+	"github.com/baptiste-b-pegasys/upgradebot/config"
 )
 
 type HTTPClient struct {
