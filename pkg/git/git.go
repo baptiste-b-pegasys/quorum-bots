@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/baptiste-b-pegasys/quorum-bots/config"
+	"upgradebot/config"
 )
 
 type Git struct {

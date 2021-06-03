@@ -1,3 +1,3 @@
-module github.com/baptiste-b-pegasys/quorum-bots
+module upgradebot
 
 go 1.15
