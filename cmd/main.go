@@ -70,8 +70,7 @@ func main() {
 		return
 	}
 	if cfg.GithubLabel != "" {
-		labelData := githubAPI.AddLabelsToIssue(createdPr.Number, cfg.GithubLabel)
-		log.Printf("labels: %+v\n", labelData)
+		_ = githubAPI.AddLabelsToIssue(createdPr.Number, cfg.GithubLabel)
 	}
 	log.Println("Done, PR: " + createdPr.HtmlUrl)
 }
