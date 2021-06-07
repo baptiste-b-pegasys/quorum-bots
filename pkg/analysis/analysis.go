@@ -4,6 +4,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+
 	"upgradebot/pkg/github"
 )
 

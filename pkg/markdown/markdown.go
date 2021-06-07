@@ -3,6 +3,7 @@ package markdown
 import (
 	"fmt"
 	"strings"
+
 	"upgradebot/pkg/analysis"
 	"upgradebot/pkg/github"
 )

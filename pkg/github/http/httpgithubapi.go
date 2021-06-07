@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"strings"
+
 	"upgradebot/config"
 	"upgradebot/pkg/github"
 )
@@ -77,7 +78,7 @@ func (api *HTTPGithub) GetGethTagComparison(base string, target string) github.T
 }
 
 // CreateQuorumPullRequest - create PR in the quorum repo
-func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.ReleaseData, prBody string) github.PullRequestData {
+func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.ReleaseData, prBody string) (*github.PullRequestData, error) {
 	title := fmt.Sprintf(PullRequestTitleFormat, data.Tag)
 	createPrBody := github.CreatePullRequest{
 		Title: title,
@@ -86,17 +87,40 @@ func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.Re
 		Head:  branchName,
 		Draft: true,
 	}
-	jsonReader, readerErr := newReader(createPrBody)
-	if readerErr != nil {
-		log.Fatal(readerErr)
-	}
-	response, err := api.httpAdapter.DoPost(api.config.QuorumAPIUrl+"/pulls", jsonReader)
+
+	jsonReader, err := newReader(createPrBody)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("json reader: %w", err)
 	}
 
-	result := github.PullRequestData{}
-	parseJson(response, &result)
+	response, err := api.httpAdapter.DoPost(api.config.QuorumAPIUrl+"/pulls", jsonReader)
+	if err != nil {
+		return nil, fmt.Errorf("do post: %w", err)
+	}
+
+	result := &github.PullRequestData{}
+	parseJson(response, result)
+
+	return result, nil
+}
+
+// AddLabelsToIssue - adds some labels to the issue
+func (api *HTTPGithub) AddLabelsToIssue(issueNumber int, labels ...string) *github.LabelsRequestData {
+	// POST {{baseUrl}}/repos/:owner/:repo/issues/:issue_number/labels a JSON body labels -> array of strings
+	labelsBody := github.LabelsRequest{Labels: labels}
+	jsonReader, readerErr := newReader(labelsBody)
+	if readerErr != nil {
+		log.Fatal(readerErr)
+		return nil
+	}
+	response, err := api.httpAdapter.DoPost(fmt.Sprintf("%s/issues/%d/labels", api.config.QuorumAPIUrl, issueNumber), jsonReader)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+
+	result := &github.LabelsRequestData{}
+	parseJson(response, result)
 
 	return result
 }
