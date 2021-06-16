@@ -27,6 +27,9 @@ func (s *Git) CloneQuorumRepository() {
 		return
 	}
 
+	// add quorum bot fork
+	s.executeGitCommandOnRepo("remote", "add", "quorumbot", s.config.QuorumBotGitRepo)
+
 	// load geth tags
 	cmd = s.buildGitCommandOnRepo("remote", "add", "geth", s.config.GethGitRepo)
 	out, err = cmd.Output()
@@ -62,16 +65,8 @@ func (s *Git) ClearQuorumRepository() {
 
 // CreateBranchFromGethTag - create a branch from a geth tag and push the branch to the remote quorum
 func (s *Git) CreateBranchFromGethTag(targetTag string, branchName string) {
-	cmd := s.buildGitCommandOnRepo("checkout", "tags/"+targetTag, "-b", branchName)
-	out, err := cmd.Output()
-	if checkCmdError("git checkout tags", cmd, out, err) {
-		return
-	}
-	cmd = s.buildGitCommandOnRepo("push", "-u", "origin", branchName)
-	out, err = cmd.Output()
-	if checkCmdError("git push", cmd, out, err) {
-		return
-	}
+	s.executeGitCommandOnRepo("checkout", "tags/"+targetTag, "-b", branchName)
+	s.executeGitCommandOnRepo("push", "-u", "quorumbot", branchName)
 }
 
 /**
