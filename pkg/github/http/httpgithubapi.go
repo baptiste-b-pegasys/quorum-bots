@@ -78,15 +78,17 @@ func (api *HTTPGithub) GetGethTagComparison(base string, target string) github.T
 }
 
 // CreateQuorumPullRequest - create PR in the quorum repo
-func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.ReleaseData, prBody string) (*github.PullRequestData, error) {
+func (api *HTTPGithub) CreateQuorumPullRequest(user string, branchName string, data github.ReleaseData, prBody string) (*github.PullRequestData, error) {
 	title := fmt.Sprintf(PullRequestTitleFormat, data.Tag)
 	createPrBody := github.CreatePullRequest{
 		Title: title,
 		Body:  prBody,
 		Base:  "master",
-		Head:  "quorumbot:" + branchName, // created from QuorumBot fork
+		Head:  user + ":" + branchName, // created from QuorumBot fork
 		Draft: true,
 	}
+
+	fmt.Println(createPrBody.Head)
 
 	jsonReader, err := newReader(createPrBody)
 	if err != nil {
@@ -100,6 +102,7 @@ func (api *HTTPGithub) CreateQuorumPullRequest(branchName string, data github.Re
 
 	result := &github.PullRequestData{}
 	parseJson(response, result)
+	fmt.Println(string(response))
 
 	return result, nil
 }
@@ -223,7 +226,7 @@ func (api *HTTPGithub) getCommitChanges(base string, target string) github.Commi
 func parseJson(body []byte, data interface{}) {
 	jsonErr := json.Unmarshal(body, data)
 	if jsonErr != nil {
-		log.Fatal(jsonErr)
+		log.Fatal(jsonErr, string(body))
 	}
 }
 

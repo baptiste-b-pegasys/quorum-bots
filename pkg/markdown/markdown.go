@@ -39,7 +39,7 @@ func CreateMarkdownHeader() string {
 	return builder.String()
 }
 
-func CreateMarkdownReleaseSection(data github.ReleaseData) string {
+func CreateMarkdownReleaseSection(data github.ReleaseData, debug bool) string {
 	builder := strings.Builder{}
 
 	fmt.Fprintf(&builder, "## Go-Ethereum Release: %s\n\n", data.Name)
@@ -51,12 +51,14 @@ func CreateMarkdownReleaseSection(data github.ReleaseData) string {
 
 	builder.WriteString("### Release notes \n\n")
 
-	builder.WriteString(data.Body)
+	if !debug {
+		builder.WriteString(data.Body)
+	}
 
 	return builder.String()
 }
 
-func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
+func CreateMarkdownAnalysisSection(analysis analysis.Analysis, debug bool) string {
 	builder := strings.Builder{}
 
 	builder.WriteString("## Codebase changes assessment\n\n")
@@ -81,15 +83,26 @@ func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 	builder.WriteString("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n")
 
 	for _, stats := range analysis.PrStats {
-		fmt.Fprintf(&builder, "| %s | [#%d](%s) | ``%s`` | %s | %s | %s | %s |\n",
-			getAssessmentEmoji(stats.Assessment),
-			stats.Data.Number,
-			stats.Data.HtmlUrl,
-			stats.Data.Title,
-			createMarkdownPullRequestFileStats(stats),
-			createMarkdownPullRequestPackageChangedStats(stats),
-			createMarkdownPullRequestLineStats(stats),
-			createMarkdownPullRequestTopChangedStats(stats))
+		if debug {
+			fmt.Fprintf(&builder, "| %s | # %d | ``%s`` | %s | %s | %s | %s |\n",
+				getAssessmentEmoji(stats.Assessment),
+				stats.Data.Number,
+				stats.Data.Title,
+				createMarkdownPullRequestFileStats(stats),
+				createMarkdownPullRequestPackageChangedStats(stats),
+				createMarkdownPullRequestLineStats(stats),
+				createMarkdownPullRequestTopChangedStats(stats))
+		} else {
+			fmt.Fprintf(&builder, "| %s | [#%d](%s) | ``%s`` | %s | %s | %s | %s |\n",
+				getAssessmentEmoji(stats.Assessment),
+				stats.Data.Number,
+				stats.Data.HtmlUrl,
+				stats.Data.Title,
+				createMarkdownPullRequestFileStats(stats),
+				createMarkdownPullRequestPackageChangedStats(stats),
+				createMarkdownPullRequestLineStats(stats),
+				createMarkdownPullRequestTopChangedStats(stats))
+		}
 	}
 
 	builder.WriteString("\n\n")
@@ -104,7 +117,7 @@ func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 			getAssessmentEmoji(stat.Assessment),
 			stat.File.Filename,
 			stat.File.GetTotalModifications(),
-			createMarkdownPullRequestDataListStats(stat.AssociatedPRs))
+			createMarkdownPullRequestDataListStats(stat.AssociatedPRs, debug))
 	}
 
 	builder.WriteString("\n\n")
@@ -112,11 +125,15 @@ func CreateMarkdownAnalysisSection(analysis analysis.Analysis) string {
 	return builder.String()
 }
 
-func createMarkdownPullRequestDataListStats(prDataArray []github.PullRequestData) string {
+func createMarkdownPullRequestDataListStats(prDataArray []github.PullRequestData, debug bool) string {
 	builder := strings.Builder{}
 
 	for _, data := range prDataArray {
-		fmt.Fprintf(&builder, "[#%d](%s)<br>", data.Number, data.HtmlUrl)
+		if debug {
+			fmt.Fprintf(&builder, "# %d<br>", data.Number)
+		} else {
+			fmt.Fprintf(&builder, "[#%d](%s)<br>", data.Number, data.HtmlUrl)
+		}
 	}
 
 	return builder.String()

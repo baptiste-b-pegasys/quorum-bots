@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+	debug := true
 	log.Println("Gather information from Go-Ethereum release to prepare an upstream upgrade")
 
 	cfg := config.GetConfig()
@@ -52,15 +53,15 @@ func main() {
 	builder := strings.Builder{}
 	builder.WriteString(markdown.CreateMarkdownHeader())
 	builder.WriteString("\n\n")
-	builder.WriteString(markdown.CreateMarkdownReleaseSection(releaseData))
+	builder.WriteString(markdown.CreateMarkdownReleaseSection(releaseData, debug))
 	builder.WriteString("\n\n")
-	builder.WriteString(markdown.CreateMarkdownAnalysisSection(analysis))
+	builder.WriteString(markdown.CreateMarkdownAnalysisSection(analysis, debug))
 	builder.WriteString("\n\n")
 
 	// Create new branch and the  upgrade PR
 	branchName := fmt.Sprintf("upgrade/go-ethereum/%s-%s", targetTag, time.Now().Format("2006102150405"))
 	git.CreateBranchFromGethTag(targetTag, branchName)
-	createdPr, err := githubAPI.CreateQuorumPullRequest(branchName, releaseData, builder.String())
+	createdPr, err := githubAPI.CreateQuorumPullRequest(cfg.GithubUsername, branchName, releaseData, builder.String())
 	if err != nil {
 		log.Fatalf("create PR: %v", err)
 		return
