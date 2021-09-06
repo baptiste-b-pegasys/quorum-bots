@@ -119,6 +119,8 @@ func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []
 	output, err := s.executeGitCommandOnRepo("diff", "--diff-filter=U", "--name-only")
 	if err != nil {
 		log.Fatal(err)
+	} else {
+		fmt.Println(string(output))
 	}
 
 	return strings.Split(string(output), "\n")
@@ -129,6 +131,8 @@ func (s *Git) GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string
 	output, err := s.executeGitCommandOnRepo("diff", "--name-only", baseGethTag)
 	if err != nil {
 		fmt.Println("error", err.Error())
+	} else {
+		fmt.Println(string(output))
 	}
 	return strings.Split(string(output), "\n")
 }
