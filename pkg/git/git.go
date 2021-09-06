@@ -127,6 +127,9 @@ func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []
 	output, err := s.executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", "-s", "recursive", targetGethTag)
 	if err != nil {
 		log.Fatal(err)
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			fmt.Println(string(exiterr.Stderr))
+		}
 	} else {
 		fmt.Println(string(output))
 	}
