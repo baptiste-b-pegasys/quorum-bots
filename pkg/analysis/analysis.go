@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"fmt"
 	"math"
 	"sort"
 	"strings"
@@ -20,7 +21,9 @@ func GetAnalysis(tagCompare github.TagCompare, filesChangedByQuorum []string, ex
 	for _, file := range filesChangedByQuorum {
 		mapFileAssessment[file] = Warning
 	}
+	fmt.Println("conflict files:")
 	for _, file := range expectedFileConflicts {
+		fmt.Println("- " + file)
 		mapFileAssessment[file] = Conflict
 	}
 
