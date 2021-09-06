@@ -109,10 +109,10 @@ func (s *Git) GetBaseGethTag() string {
 
 // GetConflictsFilesAgainstGethTargetVersion - Get the list of filenames that will have conflicts between Quorum master and the target geth tag
 func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
-	s.executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", targetGethTag)
+	s.executeGitCommandOnRepo("merge", "--no-ff", targetGethTag)
 	defer s.executeGitCommandOnRepo("merge", "--abort")
 
-	output, err := s.executeGitCommandOnRepo("diff", "--name-only", "--diff-filter=U")
+	output, err := s.executeGitCommandOnRepo("diff", "--diff-filter=U", "--name-only")
 	if err != nil {
 		log.Fatal(err)
 	}
