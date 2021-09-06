@@ -41,12 +41,16 @@ func (s *Git) CloneQuorumRepository() {
 	out, err = cmd.Output()
 	if checkCmdError("git remote add", cmd, out, err) {
 		return
+	} else {
+		fmt.Println(string(out))
 	}
 
 	cmd = s.buildGitCommandOnRepo("fetch", "geth", "--tags", "-f")
 	out, err = cmd.Output()
 	if checkCmdError("git fetch tags", cmd, out, err) {
 		return
+	} else {
+		fmt.Println(string(out))
 	}
 }
 
@@ -109,7 +113,7 @@ func (s *Git) GetBaseGethTag() string {
 
 // GetConflictsFilesAgainstGethTargetVersion - Get the list of filenames that will have conflicts between Quorum master and the target geth tag
 func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
-	s.executeGitCommandOnRepo("merge", "--no-ff", targetGethTag)
+	s.executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", targetGethTag)
 	defer s.executeGitCommandOnRepo("merge", "--abort")
 
 	output, err := s.executeGitCommandOnRepo("diff", "--diff-filter=U", "--name-only")
@@ -122,7 +126,10 @@ func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []
 
 // GetChangedFilesAgainstGethBaseVersion - Get the list of filenames that were changed by quorum when comparing with the same geth tag currently merged into quorum
 func (s *Git) GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string {
-	output, _ := s.executeGitCommandOnRepo("diff", "--name-only", baseGethTag)
+	output, err := s.executeGitCommandOnRepo("diff", "--name-only", baseGethTag)
+	if err != nil {
+		fmt.Println("error", err.Error())
+	}
 	return strings.Split(string(output), "\n")
 }
 
@@ -133,6 +140,7 @@ func (s *Git) executeGitCommandOnRepo(arg ...string) ([]byte, error) {
 }
 
 func (s *Git) buildGitCommandOnRepo(arg ...string) *exec.Cmd {
+	fmt.Println("git ", arg)
 	cmd := exec.Command("git", arg...)
 	cmd.Dir = s.config.QuorumRepoFolder
 	return cmd
