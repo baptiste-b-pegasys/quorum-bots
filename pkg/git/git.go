@@ -1,6 +1,7 @@
 package git
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -159,12 +160,19 @@ func (s *Git) GetChangedFilesAgainstGethBaseVersion(baseGethTag string) []string
 func (s *Git) executeGitCommandOnRepo(arg ...string) ([]byte, error) {
 	cmd := s.buildGitCommandOnRepo(arg...)
 	log.Println(cmd.String())
-	return cmd.Output()
+	out, err := cmd.Output()
+	if err != nil {
+		fmt.Println(cmd.Stderr.(*bytes.Buffer).String())
+	}
+	return out, err
 }
 
 func (s *Git) buildGitCommandOnRepo(arg ...string) *exec.Cmd {
 	fmt.Println("git ", arg, " on dir ", s.config.QuorumRepoFolder)
 	cmd := exec.Command("git", arg...)
+	buf := make([]byte, 1024)
+	w := bytes.NewBuffer(buf)
+	cmd.Stderr = w
 	cmd.Dir = s.config.QuorumRepoFolder
 	return cmd
 }
