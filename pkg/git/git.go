@@ -127,9 +127,12 @@ func (s *Git) GetBaseGethTag() string {
 func (s *Git) GetConflictsFilesAgainstGethTargetVersion(targetGethTag string) []string {
 	output, err := s.executeGitCommandOnRepo("merge", "--no-commit", "--no-ff", targetGethTag)
 	if err != nil {
-		log.Fatal(err)
 		if exiterr, ok := err.(*exec.ExitError); ok {
-			fmt.Println(string(exiterr.Stderr))
+			out := string(exiterr.Stderr)
+			if out != "" {
+				fmt.Println(string(exiterr.Stderr))
+			}
+			fmt.Println(string(output))
 		}
 	} else {
 		fmt.Println(string(output))
