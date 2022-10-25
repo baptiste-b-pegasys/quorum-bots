@@ -49,11 +49,20 @@ type TagCompare struct {
 }
 
 type CreatePullRequest struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
-	Head  string `json:"head"`
-	Base  string `json:"base"`
-	Draft bool   `json:"draft"`
+	Title  string                `json:"title"`
+	Body   string                `json:"body"`
+	Head   CreatePullRequestHead `json:"head"`
+	Base   CreatePullRequestBase `json:"base"`
+	Draft  bool                  `json:"draft"`
+	Labels []string              `json:"labels"`
+}
+
+type CreatePullRequestHead struct {
+	Label string `json:"label"`
+}
+
+type CreatePullRequestBase struct {
+	Ref string `json:"ref"`
 }
 
 type LabelsRequestData []LabelRequestData

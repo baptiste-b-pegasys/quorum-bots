@@ -78,14 +78,19 @@ func (api *HTTPGithub) GetGethTagComparison(base string, target string) github.T
 }
 
 // CreateQuorumPullRequest - create PR in the quorum repo
-func (api *HTTPGithub) CreateQuorumPullRequest(user string, branchName string, data github.ReleaseData, prBody string) (*github.PullRequestData, error) {
+func (api *HTTPGithub) CreateQuorumPullRequest(user string, branchName string, data github.ReleaseData, prBody string, labels []string) (*github.PullRequestData, error) {
 	title := fmt.Sprintf(PullRequestTitleFormat, data.Tag)
 	createPrBody := github.CreatePullRequest{
 		Title: title,
 		Body:  prBody,
-		Base:  "master",
-		Head:  user + ":" + branchName, // created from QuorumBot fork
-		Draft: true,
+		Base: github.CreatePullRequestBase{
+			Ref: "master",
+		},
+		Head: github.CreatePullRequestHead{
+			Label: user + ":" + branchName, // created from QuorumBot fork
+		},
+		Draft:  true,
+		Labels: labels,
 	}
 
 	fmt.Println(createPrBody.Head)
