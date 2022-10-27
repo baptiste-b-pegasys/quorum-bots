@@ -2,8 +2,8 @@ package git
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -58,7 +58,7 @@ func (s *Git) GetBaseGethTag() string {
 	matcherMajor, _ := regexp.Compile(`VersionMajor = (\d+)`)
 	matcherMinor, _ := regexp.Compile(`VersionMinor = (\d+)`)
 	matcherPatch, _ := regexp.Compile(`VersionPatch = (\d+)`)
-	out, err := ioutil.ReadFile(s.config.QuorumRepoFolder + s.config.QuorumVersionFilePath)
+	out, err := os.ReadFile(s.config.QuorumRepoFolder + s.config.QuorumVersionFilePath)
 	if err != nil {
 		log.Fatal("Error reading file "+s.config.QuorumVersionFilePath, err)
 	}
